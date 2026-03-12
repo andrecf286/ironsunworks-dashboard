@@ -1,0 +1,55 @@
+{
+  "generated": "2026-03-12T16:00:00-04:00",
+  "now_items": [
+    {"task": "Fix hot/cold exterior faucet on the workshop", "domain": "Property", "added": "2026-03-12", "due": null},
+    {"task": "Call Airgas about missed 3/1 return deadline", "domain": "Personal", "added": "2026-03-10", "due": "ASAP"},
+    {"task": "Personal tax documents to Rich Greaves — rescan originals", "domain": "Finance", "added": "2026-03-05", "due": null},
+    {"task": "File Lily's taxes — rescan W2 first", "domain": "Finance", "added": "2026-03-05", "due": null},
+    {"task": "Downgrade Max 5x plan before renewal", "domain": "Finance", "added": "2026-03-10", "due": "2026-04-08"},
+    {"task": "Make dinner reservation for wedding anniversary 3/16", "domain": "Personal", "added": "2026-03-11", "due": "2026-03-15"},
+    {"task": "Book overnight for 3/21", "domain": "Personal", "added": "2026-03-11", "due": "2026-03-19"},
+    {"task": "Call Blasko & Cummins re: windstorm roof damage", "domain": "Property", "added": "2026-03-11", "due": "ASAP"},
+    {"task": "Decide on Iron Sun Works as professional identity", "domain": "EFSP/Business", "added": "2026-03-12", "due": null},
+    {"task": "UH MyChart balance $2,366.99 — needs action", "domain": "Health/Finance", "added": "2026-03-12", "due": "2026-03-17"},
+    {"task": "Amazon Subscribe & Save — manage delivery ($13.59)", "domain": "Personal", "added": "2026-03-12", "due": "2026-03-17"},
+    {"task": "Discuss Joe Miller property interest with Jen Fitzpatrick", "domain": "Property", "added": "2026-03-12", "due": null}
+  ],
+  "domains": [
+    {"name": "EFSP", "last_touched": "2026-03-10", "task_count": 14, "top_task": "Update EFSP and PEM Working Synthesis documents"},
+    {"name": "ADHD Book", "last_touched": "2026-03-10", "task_count": 7, "top_task": "Decide primary motor metaphor file"},
+    {"name": "Health", "last_touched": "2026-03-11", "task_count": 5, "top_task": "Read neuroinflammation PDFs and discuss with Claude"},
+    {"name": "Digital Fab", "last_touched": "2026-03-09", "task_count": 5, "top_task": "Aula F87 Pro keycap fix — try Cults3D STL"},
+    {"name": "People", "last_touched": "2026-03-11", "task_count": 5, "top_task": "Review Mihir Jobalia note and decide on outreach"},
+    {"name": "Writing Methodology", "last_touched": "2026-03-10", "task_count": 4, "top_task": "Discuss Daniel Miessler 'The Great Transition'"},
+    {"name": "Finance", "last_touched": "2026-03-09", "task_count": 2, "top_task": "Jana conversation re: Team plan"},
+    {"name": "Septic Partners", "last_touched": "2026-03-10", "task_count": 2, "top_task": "Follow up on As Built documents"},
+    {"name": "Property", "last_touched": "2026-03-12", "task_count": 0, "top_task": null},
+    {"name": "Business Ideas", "last_touched": "2026-03-07", "task_count": 1, "top_task": "Schedule patent attorney consultation"},
+    {"name": "Company Research", "last_touched": "2026-03-11", "task_count": 1, "top_task": "Create research notes as companies surface"},
+    {"name": "BSB", "last_touched": "2026-03-09", "task_count": 0, "top_task": null},
+    {"name": "BoxTracker", "last_touched": "2026-03-05", "task_count": 0, "top_task": null},
+    {"name": "Home Network", "last_touched": "2026-03-11", "task_count": 0, "top_task": null},
+    {"name": "SSDI", "last_touched": "2026-03-10", "task_count": 0, "top_task": null}
+  ],
+  "scheduled_tasks": [
+    {"name": "async-email-agent", "schedule": "Every 15 min, 8am–5pm", "status": "active", "last_run": "2026-03-12"},
+    {"name": "gmail-vault-monitor", "schedule": "Daily, 7:10am", "status": "active", "last_run": "2026-03-12"},
+    {"name": "obsidian-forum-monitor", "schedule": "Daily, 2pm", "status": "active", "last_run": "2026-03-12"},
+    {"name": "efsp-competitor-monitor", "schedule": "Weekly, Monday 10am", "status": "active", "last_run": "2026-03-10"}
+  ],
+  "waiting": [
+    {"task": "Wilson & Gillissie re: SSDI representation", "since": "2026-03-09", "note": "Left voicemail for Rebecca Gillissie"},
+    {"task": "Roof quote", "since": "2026-03-05", "note": "Joe Miller interested in buying — quote still outstanding"},
+    {"task": "Porch quote", "since": "2026-03-09", "note": "Reached out to Ray Miller"},
+    {"task": "Second Pro account for onboarding skill testing", "since": "2026-03-10", "note": "Jana and Andy pondering Pro vs Teams"},
+    {"task": "James Sherosky cylinder pickup", "since": "2026-03-10", "note": "Airgas call first"}
+  ],
+  "vault_dev": [
+    {"task": "Design morning routine scheduled protocol", "added": "2026-03-12"},
+    {"task": "Memory_Context.md architecture redesign", "added": "2026-03-11"},
+    {"task": "Usage meter for vault skill operations", "added": "2026-03-10"},
+    {"task": "Design vault-based finance tracking", "added": "2026-03-12"},
+    {"task": "Review vault audit findings", "added": "2026-03-11"},
+    {"task": "Fix Claude in Chrome extension", "added": "2026-03-12"}
+  ]
+}

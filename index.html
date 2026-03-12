@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vault Dashboard</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-hover: #1c2333;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --accent-dim: #1f3a5f;
+    --green: #3fb950;
+    --green-dim: #1a3a2a;
+    --yellow: #d29922;
+    --yellow-dim: #3d2e00;
+    --red: #f85149;
+    --red-dim: #3d1214;
+    --orange: #db6d28;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+  }
+
+  header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  header .meta {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title .count {
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-size: 11px;
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+
+  /* BRIEFING (full width) */
+  .briefing-panel {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 28px;
+    min-height: 80px;
+  }
+
+  .briefing-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    text-align: center;
+    gap: 8px;
+    padding: 12px 0;
+  }
+
+  .briefing-placeholder .icon { font-size: 18px; }
+
+  /* NOW + WAITING ROW */
+  .now-waiting-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  @media (max-width: 768px) {
+    .now-waiting-row { grid-template-columns: 1fr; }
+  }
+
+  .now-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-y: auto;
+    max-height: 380px;
+  }
+
+  .waiting-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-y: auto;
+    max-height: 380px;
+  }
+
+  .now-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+
+  .now-item:last-child { border-bottom: none; }
+
+  .now-task {
+    font-size: 13px;
+    flex: 1;
+    line-height: 1.4;
+  }
+
+  .now-domain {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .badge-asap {
+    background: var(--red-dim);
+    color: var(--red);
+  }
+
+  .badge-soon {
+    background: var(--yellow-dim);
+    color: var(--yellow);
+  }
+
+  .badge-scheduled {
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  /* DOMAIN GRID */
+  .domain-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .domain-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    transition: background 0.15s;
+    cursor: default;
+  }
+
+  .domain-card:hover { background: var(--surface-hover); }
+
+  .domain-card .domain-name {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 3px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .domain-card .staleness {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+
+  .stale-fresh { background: var(--green-dim); color: var(--green); }
+  .stale-warm { background: var(--yellow-dim); color: var(--yellow); }
+  .stale-cold { background: var(--red-dim); color: var(--red); }
+
+  .domain-card .top-task {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .domain-card .task-count {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* PANELS ROW */
+  .panels-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  @media (max-width: 768px) {
+    .panels-row { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .panel-item {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .panel-item:last-child { border-bottom: none; }
+
+  .panel-item .label {
+    font-weight: 500;
+  }
+
+  .panel-item .sub {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+
+  .status-active { background: var(--green); }
+  .status-inactive { background: var(--text-muted); }
+
+  /* CALENDAR STRIP */
+  .calendar-strip {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 28px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .cal-day {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    min-width: 120px;
+    flex-shrink: 0;
+    text-align: center;
+  }
+
+  .cal-day.today {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .cal-day .day-name {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .cal-day .day-num {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 4px 0;
+  }
+
+  .cal-day .day-due {
+    font-size: 11px;
+    color: var(--yellow);
+    margin-top: 4px;
+  }
+
+  /* INTERACTION PLACEHOLDER */
+  .interaction-placeholder {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+
+  .interaction-placeholder .icon { font-size: 24px; margin-bottom: 8px; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Vault Dashboard</h1>
+  <div class="meta">
+    <span id="generated-time"></span>
+  </div>
+</header>
+
+<!-- INTERACTION LAYER -->
+<div class="interaction-placeholder">
+  <div class="icon">&#9889;</div>
+  <div>Interaction layer — under design. Hosting: Namecheap (ironsunworks.com).</div>
+</div>
+
+<!-- BRIEFING (full width) -->
+<div class="section-title">Briefing</div>
+<div class="briefing-panel" id="briefing-panel">
+  <div class="briefing-placeholder">
+    <span class="icon">&#9783;</span>
+    <span>Daily briefing — not yet built. Will surface: gmail-vault-monitor output, overnight agent activity, session recommendations, stale domain alerts.</span>
+  </div>
+</div>
+
+<!-- CALENDAR STRIP -->
+<div class="section-title">Next 7 Days</div>
+<div class="calendar-strip" id="calendar-strip"></div>
+
+<!-- NOW + WAITING -->
+<div class="now-waiting-row">
+  <div>
+    <div class="section-title">Now <span class="count" id="now-count"></span></div>
+    <div class="now-panel" id="now-panel"></div>
+  </div>
+  <div>
+    <div class="section-title">Waiting <span class="count" id="waiting-count"></span></div>
+    <div class="waiting-panel" id="waiting-panel"></div>
+  </div>
+</div>
+
+<!-- DOMAIN GRID -->
+<div class="section-title">Domains <span class="count" id="domain-count"></span></div>
+<div class="domain-grid" id="domain-grid"></div>
+
+<!-- SCHEDULED + VAULT DEV -->
+<div class="panels-row">
+  <div class="panel">
+    <div class="section-title">Scheduled Tasks <span class="count" id="sched-count"></span></div>
+    <div id="scheduled-panel"></div>
+  </div>
+  <div class="panel">
+    <div class="section-title">Vault Development <span class="count" id="vaultdev-count"></span></div>
+    <div id="vaultdev-panel"></div>
+  </div>
+</div>
+
+<footer>
+  Vault Dashboard v0.1 &mdash; Data source: dashboard_data.json &mdash; Andy Foti
+</footer>
+
+<script>
+// CONFIG: Change this URL when moving to remote hosting
+// For local file:// usage, data is embedded below as fallback
+const DATA_SOURCE = './dashboard_data.json';
+
+const EMBEDDED_DATA = {"generated":"2026-03-12T16:00:00-04:00","now_items":[{"task":"Fix hot/cold exterior faucet on the workshop","domain":"Property","added":"2026-03-12","due":null},{"task":"Call Airgas about missed 3/1 return deadline","domain":"Personal","added":"2026-03-10","due":"ASAP"},{"task":"Personal tax documents to Rich Greaves — rescan originals","domain":"Finance","added":"2026-03-05","due":null},{"task":"File Lily's taxes — rescan W2 first","domain":"Finance","added":"2026-03-05","due":null},{"task":"Downgrade Max 5x plan before renewal","domain":"Finance","added":"2026-03-10","due":"2026-04-08"},{"task":"Make dinner reservation for wedding anniversary 3/16","domain":"Personal","added":"2026-03-11","due":"2026-03-15"},{"task":"Book overnight for 3/21","domain":"Personal","added":"2026-03-11","due":"2026-03-19"},{"task":"Call Blasko & Cummins re: windstorm roof damage","domain":"Property","added":"2026-03-11","due":"ASAP"},{"task":"Decide on Iron Sun Works as professional identity","domain":"EFSP/Business","added":"2026-03-12","due":null},{"task":"UH MyChart balance $2,366.99 — needs action","domain":"Health/Finance","added":"2026-03-12","due":"2026-03-17"},{"task":"Amazon Subscribe & Save — manage delivery ($13.59)","domain":"Personal","added":"2026-03-12","due":"2026-03-17"},{"task":"Discuss Joe Miller property interest with Jen Fitzpatrick","domain":"Property","added":"2026-03-12","due":null}],"domains":[{"name":"EFSP","last_touched":"2026-03-10","task_count":14,"top_task":"Update EFSP and PEM Working Synthesis documents"},{"name":"ADHD Book","last_touched":"2026-03-10","task_count":7,"top_task":"Decide primary motor metaphor file"},{"name":"Health","last_touched":"2026-03-11","task_count":5,"top_task":"Read neuroinflammation PDFs and discuss with Claude"},{"name":"Digital Fab","last_touched":"2026-03-09","task_count":5,"top_task":"Aula F87 Pro keycap fix — try Cults3D STL"},{"name":"People","last_touched":"2026-03-11","task_count":5,"top_task":"Review Mihir Jobalia note and decide on outreach"},{"name":"Writing Methodology","last_touched":"2026-03-10","task_count":4,"top_task":"Discuss Daniel Miessler 'The Great Transition'"},{"name":"Finance","last_touched":"2026-03-09","task_count":2,"top_task":"Jana conversation re: Team plan"},{"name":"Septic Partners","last_touched":"2026-03-10","task_count":2,"top_task":"Follow up on As Built documents"},{"name":"Property","last_touched":"2026-03-12","task_count":0,"top_task":null},{"name":"Business Ideas","last_touched":"2026-03-07","task_count":1,"top_task":"Schedule patent attorney consultation"},{"name":"Company Research","last_touched":"2026-03-11","task_count":1,"top_task":"Create research notes as companies surface"},{"name":"BSB","last_touched":"2026-03-09","task_count":0,"top_task":null},{"name":"BoxTracker","last_touched":"2026-03-05","task_count":0,"top_task":null},{"name":"Home Network","last_touched":"2026-03-11","task_count":0,"top_task":null},{"name":"SSDI","last_touched":"2026-03-10","task_count":0,"top_task":null}],"scheduled_tasks":[{"name":"async-email-agent","schedule":"Every 15 min, 8am–5pm","status":"active","last_run":"2026-03-12"},{"name":"gmail-vault-monitor","schedule":"Daily, 7:10am","status":"active","last_run":"2026-03-12"},{"name":"obsidian-forum-monitor","schedule":"Daily, 2pm","status":"active","last_run":"2026-03-12"},{"name":"efsp-competitor-monitor","schedule":"Weekly, Monday 10am","status":"active","last_run":"2026-03-10"}],"waiting":[{"task":"Wilson & Gillissie re: SSDI representation","since":"2026-03-09","note":"Left voicemail for Rebecca Gillissie"},{"task":"Roof quote","since":"2026-03-05","note":"Joe Miller interested in buying — quote still outstanding"},{"task":"Porch quote","since":"2026-03-09","note":"Reached out to Ray Miller"},{"task":"Second Pro account for onboarding skill testing","since":"2026-03-10","note":"Jana and Andy pondering Pro vs Teams"},{"task":"James Sherosky cylinder pickup","since":"2026-03-10","note":"Airgas call first"}],"vault_dev":[{"task":"Design morning routine scheduled protocol","added":"2026-03-12"},{"task":"Memory_Context.md architecture redesign","added":"2026-03-11"},{"task":"Usage meter for vault skill operations","added":"2026-03-10"},{"task":"Design vault-based finance tracking","added":"2026-03-12"},{"task":"Review vault audit findings","added":"2026-03-11"},{"task":"Fix Claude in Chrome extension","added":"2026-03-12"}]};
+
+const TODAY = new Date();
+TODAY.setHours(0, 0, 0, 0);
+
+function daysBetween(dateStr) {
+  if (!dateStr) return 999;
+  const d = new Date(dateStr + 'T00:00:00');
+  const diff = TODAY - d;
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
+}
+
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const d = new Date(dateStr + 'T00:00:00');
+  const diff = d - TODAY;
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+function stalenessClass(days) {
+  if (days <= 2) return 'stale-fresh';
+  if (days <= 5) return 'stale-warm';
+  return 'stale-cold';
+}
+
+function stalenessLabel(days) {
+  if (days === 0) return 'today';
+  if (days === 1) return '1 day';
+  return days + ' days';
+}
+
+function dueBadge(due) {
+  if (!due) return '';
+  if (due === 'ASAP') return '<span class="badge badge-asap">ASAP</span>';
+  const d = daysUntil(due);
+  if (d === null) return '';
+  if (d < 0) return '<span class="badge badge-asap">overdue</span>';
+  if (d <= 3) return '<span class="badge badge-soon">due in ' + d + 'd</span>';
+  return '<span class="badge badge-scheduled">' + due.slice(5) + '</span>';
+}
+
+function renderCalendar(data) {
+  const strip = document.getElementById('calendar-strip');
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  // Build a map of due dates
+  const dueMap = {};
+  data.now_items.forEach(item => {
+    if (item.due && item.due !== 'ASAP') {
+      if (!dueMap[item.due]) dueMap[item.due] = [];
+      dueMap[item.due].push(item.task.substring(0, 30));
+    }
+  });
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(TODAY);
+    d.setDate(d.getDate() + i);
+    const key = d.toISOString().slice(0, 10);
+    const isToday = i === 0;
+
+    const el = document.createElement('div');
+    el.className = 'cal-day' + (isToday ? ' today' : '');
+
+    let dueHtml = '';
+    if (dueMap[key]) {
+      dueHtml = dueMap[key].map(t => '<div class="day-due">' + t + '...</div>').join('');
+    }
+
+    el.innerHTML = `
+      <div class="day-name">${dayNames[d.getDay()]}</div>
+      <div class="day-num">${d.getDate()}</div>
+      <div class="day-name">${monthNames[d.getMonth()]}</div>
+      ${dueHtml}
+    `;
+    strip.appendChild(el);
+  }
+}
+
+function renderNow(items) {
+  const panel = document.getElementById('now-panel');
+  document.getElementById('now-count').textContent = items.length;
+
+  // Sort: ASAP first, then by due date (soonest first), then undated
+  items.sort((a, b) => {
+    if (a.due === 'ASAP' && b.due !== 'ASAP') return -1;
+    if (b.due === 'ASAP' && a.due !== 'ASAP') return 1;
+    if (a.due && a.due !== 'ASAP' && b.due && b.due !== 'ASAP') return a.due.localeCompare(b.due);
+    if (a.due && !b.due) return -1;
+    if (!a.due && b.due) return 1;
+    return 0;
+  });
+
+  items.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'now-item';
+    el.innerHTML = `
+      <div class="now-task">${item.task}</div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span class="now-domain">${item.domain}</span>
+        ${dueBadge(item.due)}
+      </div>
+    `;
+    panel.appendChild(el);
+  });
+}
+
+function renderDomains(domains) {
+  const grid = document.getElementById('domain-grid');
+  document.getElementById('domain-count').textContent = domains.length;
+
+  // Sort by staleness (most stale first gives urgency; most fresh first shows momentum)
+  // Going with most stale first — the "cold" ones should stand out
+  domains.sort((a, b) => daysBetween(a.last_touched) - daysBetween(b.last_touched));
+  // Actually, sort active domains (with tasks) first, then by staleness desc
+  domains.sort((a, b) => {
+    if (a.task_count > 0 && b.task_count === 0) return -1;
+    if (a.task_count === 0 && b.task_count > 0) return 1;
+    return daysBetween(b.last_touched) - daysBetween(a.last_touched);
+  });
+
+  domains.forEach(d => {
+    const days = daysBetween(d.last_touched);
+    const el = document.createElement('div');
+    el.className = 'domain-card';
+    el.innerHTML = `
+      <div class="domain-name">
+        ${d.name}
+        <span class="staleness ${stalenessClass(days)}">${stalenessLabel(days)}</span>
+      </div>
+      ${d.top_task ? '<div class="top-task">' + d.top_task + '</div>' : '<div class="top-task" style="font-style:italic;">No queued tasks</div>'}
+      ${d.task_count > 0 ? '<div class="task-count">' + d.task_count + ' task' + (d.task_count !== 1 ? 's' : '') + ' in domain</div>' : ''}
+    `;
+    grid.appendChild(el);
+  });
+}
+
+function renderScheduled(tasks) {
+  const panel = document.getElementById('scheduled-panel');
+  document.getElementById('sched-count').textContent = tasks.length;
+
+  tasks.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'panel-item';
+    el.innerHTML = `
+      <div class="label">
+        <span class="status-dot ${t.status === 'active' ? 'status-active' : 'status-inactive'}"></span>
+        ${t.name}
+      </div>
+      <div class="sub">${t.schedule}</div>
+    `;
+    panel.appendChild(el);
+  });
+}
+
+function renderWaiting(items) {
+  const panel = document.getElementById('waiting-panel');
+  document.getElementById('waiting-count').textContent = items.length;
+
+  items.forEach(item => {
+    const days = daysBetween(item.since);
+    const el = document.createElement('div');
+    el.className = 'panel-item';
+    el.innerHTML = `
+      <div class="label">${item.task}</div>
+      <div class="sub">${item.note} &mdash; ${days}d waiting</div>
+    `;
+    panel.appendChild(el);
+  });
+}
+
+function renderVaultDev(items) {
+  const panel = document.getElementById('vaultdev-panel');
+  document.getElementById('vaultdev-count').textContent = items.length;
+
+  items.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'panel-item';
+    el.innerHTML = `<div class="label">${item.task}</div><div class="sub">Added ${item.added}</div>`;
+    panel.appendChild(el);
+  });
+}
+
+// LOAD AND RENDER
+function render(data) {
+  document.getElementById('generated-time').textContent = 'Data from: ' + new Date(data.generated).toLocaleString();
+  renderCalendar(data);
+  renderNow(data.now_items);
+  renderDomains(data.domains);
+  renderScheduled(data.scheduled_tasks);
+  renderWaiting(data.waiting);
+  renderVaultDev(data.vault_dev);
+}
+
+// Try fetch first (works when served via HTTP), fall back to embedded data (works for file://)
+fetch(DATA_SOURCE)
+  .then(r => r.json())
+  .then(render)
+  .catch(() => render(EMBEDDED_DATA));
+</script>
+</body>
+</html>
